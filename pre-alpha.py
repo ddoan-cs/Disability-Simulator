@@ -26,7 +26,8 @@ import random as rand
 ENERGY=rand.randint(50, 100)
 DAYS_LEFT=3
 HOURS_LEFT=24
-#   "task": (energy, deadline)
+# "task": (energy, deadline)
+# Not using the deadline yet
 DAILY_TASKS = {
     "Get out of bed": (10, 1),
     "Brush your teeth": (5, 1),
@@ -47,22 +48,33 @@ class State():
     for prop in self.d.keys():
       if self.d[prop] != s2.d[prop]: return False
     return True
-
-  def task_to_string(task_name):
+  
+  def get_task_info(self, task_name):
     if task_name in DAILY_TASKS:
-        return task + ", energy cost: "+ str(task[1]) + "\n"
-    
+      task_info = DAILY_TASKS[task_name]
+    return task_info
+
+  def task_to_string(self, task_name):
+    txt = None
+    task_info = self.get_task_info(task_name)
+    txt = task_name + ", energy cost: "+ str(task_info[0]) + "\n"
+    return txt
+  
   def __str__(self):
     # Produces a textual description of a state.
     txt = ""
     for prop in self.d.keys():
       if prop == "tasks":
-        pass
+        continue
       txt += prop + " left: " + str(self.d[prop]) + "\n"
-    txt += "The remaining tasks are: \n"
+    remaining =""
+    finished = ""
     for task in self.d["tasks"]:
-      self.task_to_string(task)
-      txt += task[0] + ", energy cost: "+ str(task[1]) + "\n"
+      if task[1]:
+        finished += self.task_to_string(task[0])
+      else:
+        remaining += self.task_to_string(task[0])
+    txt += "The remaining tasks are: \n" + remaining + "The finished tasks are: \n" + finished
     return txt
 
   def __hash__(self):
@@ -76,60 +88,50 @@ class State():
       if prop == "tasks":
         pass
       news.d[prop] = self.d[prop]
-    news.d['tasks']=[(task[0], task[1]) for task in self.d.tasks]
+    news.d['tasks']=[(task[0], task[1]) for task in self.d["tasks"]]
     return news 
 
-  def can_complete(self, d, task):
-    '''Tests whether it's legal to complete the specific task.'''
-    side = self.d['ferry'] # Where the ferry is.
-    p = self.d['agents']
-    if h<1: return False # Need an H to steer boat.
-    h_available = p[H][side]
-    if h_available < h: return False # Can't take more h's than available
-    r_available = p[R][side]
-    if r_available < r: return False # Can't take more r's than available
-    h_remaining = h_available - h
-    r_remaining = r_available - r
-    # Humans must not be outnumbered on either side:
-    if h_remaining > 0 and h_remaining < r_remaining: return False
-    h_at_arrival = p[H][1-side]+h
-    r_at_arrival = p[R][1-side]+r
-    if h_at_arrival > 0 and h_at_arrival < r_at_arrival: return False
-    return True
+  def task_index(self, task):
+    for (i, t) in enumerate(self.d["tasks"]):
+      if t[0] == task:
+        return i
 
+  def can_complete(self, task):
+    task_info = self.get_task_info(task)
+    engery_cost = task_info[0]
+    task_index = self.task_index(task)
+    return self.d["energy"] - engery_cost >= 0 and not self.d["tasks"][task_index][1]
 
-  def move(self,h,r):
-    '''Assuming it's legal to make the move, this computes
-     the new state resulting from moving the ferry carrying
-     h humans and r robots.'''
+  def complete(self, task):
     news = self.copy()      # start with a deep copy.
-    side = self.d['ferry']        # where is the ferry?
-    p = news.d['agents']          # get the array of arrays of agents.
-    p[H][side] = p[H][side]-h     # Remove agents from the current side.
-    p[R][side] = p[R][side]-r
-    p[H][1-side] = p[H][1-side]+h # Add them at the other side.
-    p[R][1-side] = p[R][1-side]+r
-    news.d['ferry'] = 1-side      # Move the ferry itself.
+    task_info = self.get_task_info(task)
+    news.d["energy"] -= task_info[0]
+    task_index = self.task_index(task)
+    news.d["tasks"][task_index] = (self.d["tasks"][task_index][0], True)
+    return news
+
+  def sleep(self): 
+    news = State()
+    news.d["energy"] = self.d["energy"] + 20
+    news.d["days"] = self.d["days"] - 1
     return news
 
   def is_goal(self):
-    '''If all Ms and Cs are on the right, then s is a goal state.'''
-    p = self.d['agents']
-    return (p[H][RIGHT]==3 and p[R][RIGHT]==3)
+    return self.d["days"] == 0
 
   def goal_message(self):
-    return "Congratulations on successfully guiding the humans and robots across the creek!"
+    return "Congratulations on successfully finishing the first three days of your simulation!"
 
 #</COMMON_CODE>
 
 #<OPERATORS>
 from soluzion import Basic_Operator as Operator
 
-HR_combinations = [(1,0),(2,0),(3,0),(1,1),(2,1)]
-
 OPERATORS = [Operator(
-  "Cross the creek with "+str(h)+" humans and "+str(r)+" robots",
-  lambda s, h1=h, r1=r: s.can_move(h1,r1),
-  lambda s, h1=h, r1=r: s.move(h1,r1) ) 
-  for (h,r) in HR_combinations]
+  "Compeleting task: " + task,
+  lambda s, task1=task: s.can_complete(task1),
+  lambda s, task1=task: s.complete(task1) ) 
+  for task in DAILY_TASKS.keys()]
+
+OPERATORS += [Operator("Sleeping", lambda s: True,lambda s: s.sleep())]
 #</OPERATORS>
