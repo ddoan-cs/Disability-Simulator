@@ -62,7 +62,7 @@ class State():
   
   def __str__(self):
     # Produces a textual description of a state.
-    txt = ""
+    txt = "\n \n"
     for prop in self.d.keys():
       if prop == "tasks":
         continue
@@ -74,7 +74,7 @@ class State():
         finished += self.task_to_string(task[0])
       else:
         remaining += self.task_to_string(task[0])
-    txt += "The remaining tasks are: \n" + remaining + "The finished tasks are: \n" + finished
+    txt += "\nThe remaining tasks are: \n" + remaining + "The finished tasks are: \n" + finished
     return txt
 
   def __hash__(self):
@@ -128,7 +128,7 @@ class State():
 from soluzion import Basic_Operator as Operator
 
 OPERATORS = [Operator(
-  "Compeleting task: " + task,
+  "Completing task: " + task,
   lambda s, task1=task: s.can_complete(task1),
   lambda s, task1=task: s.complete(task1) ) 
   for task in DAILY_TASKS.keys()]
