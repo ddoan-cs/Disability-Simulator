@@ -7,7 +7,7 @@ a. Add an "accusation_phase" variable to states.
 b. Add a "current_accusation" variable to states.
 c. Add operators analogous to the suggestion operators,
  but for accusations.
-d. Update the vis to show 
+d. Update the vis to show
     i. accusation in progress (but not what it is).
     ii. results of the accusation, followed by
           acknowledge end of turn, if wrong;
@@ -25,40 +25,40 @@ PROBLEM_CREATION_DATE = "28-APR-2024"
 # or the SVG graphics client.
 PROBLEM_DESC=\
  '''This is the alpha version of our disability simulator game.
- It will showcase the general direction of the game focusing on a couple of the first 
- major events in the storyline. The game will include the most concrete states 
+ It will showcase the general direction of the game focusing on a couple of the first
+ major events in the storyline. The game will include the most concrete states
  that do not involve other aspects of the game outside of our main operator: Starting
  and completing a task.
 
 '''
 #</METADATA>
 
-import random as r; 
+import random as r;
 #<COMMON_DATA>
 ENERGY=r.randint(50, 100)
 ACCOMMODATION=0
 HAPPINESS=50
 HOURS_LEFT=24
 
-# Days left is still undecided. 
-# Should cover mostly major events/tasks. 
+# Days left is still undecided.
+# Should cover mostly major events/tasks.
 DAYS_LEFT=3
 
 # "task": (uniqueid, energy cost , deadline, prereq tasks)
-# daily task uniqueid is just day the tasks will appear 
+# daily task uniqueid is just day the tasks will appear
 # major task uniqueid is just task + i where i is the task number
 # Not using the deadline yet
 TASKS = {
-    # Daily Tasks 
+    # Daily Tasks
     "Get out of bed": (10, 1, None),
     "Brush your teeth": (5, 1, None),
     "Eat breakfast": (15, 1, None),
 
-    # Major Events 
+    # Major Events
     "Schedule a Doctor's Appointment": (10, 1, None),
     "Go to the doctor": (10, 1, ["Schedule a Doctor's Appointment"]),
 
-    #"Request Accommodations": ("accommodation1", 10, 1, None) 
+    #"Request Accommodations": ("accommodation1", 10, 1, None)
 }
 
 #</COMMON_DATA>
@@ -68,13 +68,13 @@ DEBUG=True
 
 class State():
   def __init__(self, d=None):
-    if d==None: 
+    if d==None:
       d = {'energy': ENERGY,
            'hours': HOURS_LEFT,
            'days': DAYS_LEFT,
-           'tasks': [("Get out of bed", False), ("Brush your teeth", False), 
-                     ("Eat breakfast", False), ("Schedule a Doctor's Appointment", False), ("Go to the doctor", False)], 
-           'accommodations': ACCOMMODATION, 
+           'tasks': [("Get out of bed", False), ("Brush your teeth", False),
+                     ("Eat breakfast", False), ("Schedule a Doctor's Appointment", False), ("Go to the doctor", False)],
+           'accommodations': ACCOMMODATION,
            'happiness': HAPPINESS
           }
     self.d = d
@@ -83,7 +83,7 @@ class State():
     for prop in self.d.keys():
       if self.d[prop] != s2.d[prop]: return False
     return True
-  
+
   def get_task_info(self, task_name):
     if task_name in TASKS:
       task_info = TASKS[task_name]
@@ -94,7 +94,7 @@ class State():
     task_info = self.get_task_info(task_name)
     txt = task_name + ", energy cost: "+ str(task_info[0]) + "\n"
     return txt
-  
+
   def __str__(self):
     # Produces a textual description of a state.
     txt = "\n \n"
@@ -124,7 +124,7 @@ class State():
         pass
       news.d[prop] = self.d[prop]
     news.d['tasks']=[(task[0], task[1]) for task in self.d["tasks"]]
-    return news 
+    return news
 
   def task_index(self, task):
     for (i, t) in enumerate(self.d["tasks"]):
@@ -149,12 +149,12 @@ class State():
   def complete(self, task):
     news = self.__copy__()      # start with a deep copy.
     task_info = self.get_task_info(task)
-    news.d["energy"] = news.d["energy"] + task_info[0] + news.d["accommodations"]
+    news.d["energy"] = news.d["energy"] - task_info[0] + news.d["accommodations"]
     task_index = self.task_index(task)
     news.d["tasks"][task_index] = (self.d["tasks"][task_index][0], True)
     return news
 
-  def sleep(self): 
+  def sleep(self):
     news = State()
     news.d["energy"] = self.d["energy"] + 20
     news.d["days"] = self.d["days"] - 1
@@ -165,9 +165,9 @@ class State():
 
   def goal_message(self):
     return "Congratulations on successfully finishing the first three days of your simulation!"
-  
+
 SESSION = None
-INACTIVE_PLAYERS = None 
+INACTIVE_PLAYERS = None
 
 def next_player(k, inactive_ok=False):
   if SESSION==None: return 0 # Roles not ready
@@ -211,13 +211,13 @@ class Operator:
 OPERATORS = [Operator(
   "Completing task: " + task,
   lambda s, role=0, task1=task: s.can_complete(task1),
-  lambda s, role=0, task1=task: s.complete(task1) ) 
+  lambda s, role=0, task1=task: s.complete(task1) )
   for task in TASKS.keys()]
 
-OPERATORS += [Operator("Sleeping", 
+OPERATORS += [Operator("Sleeping",
   lambda s, role=0: True,
   lambda s, role=0: s.sleep())]
-                      
+
 if DEBUG:
   print("All operators:")
   for o in OPERATORS:
