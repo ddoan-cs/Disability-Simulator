@@ -11,17 +11,27 @@ DEBUG = False
 W = 850 # Width of Vis. region
 SQW = W/8
 HALF_SQW = SQW/2
-H = 400
+H = 600
 THREE_QUARTER_SQW = 3*(HALF_SQW/2)
 IMAGE_WIDTH = 200 # Just a guess
 IMAGE_HEIGHT = 350 # "   "   "
+
 ROLE_COLOR = [
+    "rgb(100, 100, 150)", 
+    "rgb(150, 100, 100)", 
     "rgb(150, 150, 150)"] # no-role or observer: darker gray.
+
+# Gradient colors for different slot types
+SLOT_GRADIENT_COLORS = {
+    SlotType.EMPTY: ["#fce3ae", "#ddb7ab"], # Light Yellow to Light Peach
+    SlotType.START: ["#ffb482", "#e5989b"], # Light Orange to Light Pink
+    SlotType.END: ["#b0d07e", "#89c4f4"],   # Light Green to Light Blue
+    SlotType.EVENT: ["#ffbae1", "#e687c5"], # Light Pink to Pink
+}
 
 session = None
 def render_state(s, roles=None):
     global session
-    #if DEBUG: print("In HalfClue_SVG_VIS_FOR_BRIFL.py, s = "+str(s))
     session = get_session() # Need HOST and PORT info for accessing images.
     dwg = svgwrite.Drawing(filename = "test-svgwrite.svg",
                            id = "state_svg",  # Must match the id in the html template.
@@ -29,84 +39,99 @@ def render_state(s, roles=None):
                            debug=True)
 
     if roles==None or roles==[]:
-      label = "This player doesn't have any role in the game."
-      x = 100; y = 100
-      dwg.add(dwg.text(label, insert = (x+HALF_SQW, y+THREE_QUARTER_SQW),
+        label = "This player doesn't have any role in the game."
+        x = 200; y = 100
+        dwg.add(dwg.text(label, insert = (x+HALF_SQW, y+THREE_QUARTER_SQW),
                      text_anchor="middle",
                      font_size="25",
                      fill = "red"))
     else:
-      yc = 100
-      role = roles[0]
-      #for role in roles:
-         # Background rectangle...
-      dwg.add(dwg.rect(insert = (0,0),
+        index = 0
+        if s.d['currentPlayer'] == "Player1": 
+            index = 0
+        else: 
+            index = 1
+        #for role in roles:
+        dwg.add(dwg.rect(insert = (0,0),
                      size = (str(W)+"px", str(H)+"px"),
                      stroke_width = "1",
                      stroke = "black",
-                     fill = ROLE_COLOR[role]))
+                     fill = ROLE_COLOR[roles[index]]))
 
-         #y = 100
-      print("Rendering for role "+ROLES[0]['name'])
+        position = s.current_position(NAMES[roles[(index + 1) % 2]])
 
 
-      label = "This is for the role of "+ROLES[0]['name']
-      x = 300; y = 100
-      dwg.add(dwg.text(label, insert = (x+HALF_SQW, y-THREE_QUARTER_SQW),
+        # Define gradients for each SlotType
+        for slot_type, colors in SLOT_GRADIENT_COLORS.items():
+            gradient_id = "grad_" + slot_type.name
+            gradient = dwg.linearGradient((0, 0), (0, 1), id=gradient_id)
+            gradient.add_stop_color(0, colors[0])
+            gradient.add_stop_color(1, colors[1])
+            dwg.defs.add(gradient)
+
+        # Generate the board
+        space_width = int(W / 8)
+        for i in range(24):
+            x = i % 8 * space_width
+            y = i // 8 * space_width
+            slot_type = POSITIONS.get(i, SlotType.EMPTY)
+            gradient_id = "grad_" + slot_type.name
+        
+            # Draw the main block with gradient fill
+            dwg.add(dwg.rect(insert=(x, y + 75),
+                        size=(str(space_width) + "px", str(space_width) + "px"),
+                        stroke_width="1",
+                        stroke="black",
+                        fill="url(#" + gradient_id + ")"))
+
+            # Add board position text
+            dwg.add(dwg.text(str(i + 1), insert=(x + 5, y + 75 + 20), fill="black", font_size="12px"))
+
+            # Add a marker at the player's position
+            if i == position:
+                dwg.add(dwg.circle(center=(x + space_width/2, y + 75 + space_width/2),
+                           r=space_width/4,
+                           fill=ROLE_COLOR[index]))  
+      
+        label = "It is now " + NAMES[roles[index]] + "'s turn."
+        x = 350; y = 100
+        dwg.add(dwg.text(label, insert = (x+HALF_SQW, y-THREE_QUARTER_SQW),
                      text_anchor="middle",
                      font_size="25",
                      stroke = "black",
-                     fill = "black"))
+                     fill = "black"))  
 
-    render_meter(dwg, 100, 60, 200, 160, 5, 10, "Ballroom.jpg")
-    render_task_list(dwg, s, 500, 60)
+        # Add legend
+        legend_x = 20
+        legend_y = 430
+        legend_width = 20
+        legend_height = 20
+
+        for slot_type, colors in SLOT_GRADIENT_COLORS.items():
+            gradient_id = "grad_" + slot_type.name
+            legend_rect = dwg.rect(insert=(legend_x, legend_y),
+                                size=(str(legend_width) + "px", str(legend_height) + "px"),
+                                stroke_width="1",
+                                stroke="black",
+                                fill="url(#" + gradient_id + ")")
+            dwg.add(legend_rect)
+
+            legend_text = dwg.text(slot_type.name,
+                                insert=(legend_x + legend_width + 5, legend_y + legend_height / 2),
+                                fill="black",
+                                font_size="12px")
+            dwg.add(legend_text)
+
+            legend_y += legend_height + 5
+
     svg_string = dwg.tostring()
 
     #print("svg_string is "); print(svg_string)    return svg_string
     return svg_string
 
-def render_meter(dwg, x, y, width, height, value, max_value, image_filename=None):
-    # Calculate the number of filled squares
-    filled_squares = int(value / max_value * 8)
-
-    # Define the size of each square and the image size
-    square_size = min(width, height) / 8
-    image_size = square_size * 1.2
-
-    # Insert the image
-    if image_filename:
-        dwg.add(dwg.image(image_filename, insert=(x - 20, y + 5), size=(image_size, image_size)))
-
-    # Draw the filled squares
-    for i in range(filled_squares):
-        dwg.add(dwg.rect(insert=(x + i * square_size, y),
-                          size=(square_size, square_size),
-                          fill="yellow",
-                          stroke="black"))
-
-    # Draw the empty squares
-    for i in range(filled_squares, 8):
-        dwg.add(dwg.rect(insert=(x + i * square_size, y),
-                          size=(square_size, square_size),
-                          fill="white",
-                          stroke="black"))
-
-def render_task_list(dwg, s, x, y):
-    # Renders all tasks not yet completed
-    # Need to update for subtasks
-    completed_tasks = [task_name for (task_name, completed) in s.d["tasks"] if not completed]
-    line_height = 20
-    box_width = 200
-    box_height = (len(completed_tasks) + 1) * line_height
-    dwg.add(dwg.rect(insert=(x, y), size=(box_width, box_height), fill="white", stroke="black"))
-    dwg.add(dwg.text("Tasks", insert=(x + 5, y + 15), font_size="20", fill="black"))
-    for i, task_name in enumerate(completed_tasks):
-        dwg.add(dwg.text(f"{task_name}", insert=(x + 5, y + 35 + i * line_height),
-                         font_size="10", fill="black"))
-
 if __name__ == '__main__':
     DEBUG = True
-    session = {'HOST': 'localhost', 'PORT':5000}
+    session = {'HOST': 'tempura.cs.washington.edu', 'PORT':5000}
     INITIAL_STATE = State()
     print(INITIAL_STATE)
     svg_string = render_state(INITIAL_STATE, roles=[0])

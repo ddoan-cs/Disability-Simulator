@@ -29,7 +29,7 @@ MAX_HAPPINESS = 100
 
 
 """Board"""
-BOARD_LENGTH = 24
+BOARD_LENGTH = 23
 from enum import Enum
 
 class SlotType(Enum):
@@ -47,29 +47,28 @@ class SlotType(Enum):
 POSITIONS = {
     0: SlotType.START,
     1: SlotType.EMPTY,
-    2: SlotType.EMPTY,
+    2: SlotType.EVENT,
     3: SlotType.EVENT,
-    4: SlotType.EVENT,
+    4: SlotType.EMPTY,
     5: SlotType.EMPTY,
-    6: SlotType.EMPTY,
-    7: SlotType.EVENT,
-    8: SlotType.EVENT,
+    6: SlotType.EVENT,
+    7: SlotType.EMPTY,
+    8: SlotType.EMPTY,
     9: SlotType.EVENT,
-    10: SlotType.EVENT,
-    11: SlotType.EMPTY,
-    12: SlotType.EVENT,
-    13: SlotType.EMPTY,
-    14: SlotType.EVENT,
-    15: SlotType.EVENT,
-    16: SlotType.EMPTY,
-    17: SlotType.EVENT,
-    18: SlotType.EMPTY,
-    19: SlotType.EVENT,
+    10: SlotType.EMPTY,
+    11: SlotType.EVENT,
+    12: SlotType.EMPTY,
+    13: SlotType.EVENT,
+    14: SlotType.EMPTY,
+    15: SlotType.EMPTY,
+    16: SlotType.EVENT,
+    17: SlotType.EMPTY,
+    18: SlotType.EVENT,
+    19: SlotType.EMPTY,
     20: SlotType.EVENT,
-    21: SlotType.EVENT,
+    21: SlotType.EMPTY,
     22: SlotType.EMPTY,
-    23: SlotType.EMPTY,
-    24: SlotType.END
+    23: SlotType.END
 }
 
 """Slot Values"""
@@ -78,22 +77,31 @@ SLOTS = {
     # Slot = {
     #        0: {“message in slot”,  “(metric, cost)”, }
     #        }
-
+    # cost: ("Happiness, Position")
 
     # Positive Events
-    0: {"type": "positive", "message": "You were able to schedule a doctor's appointment.", "cost": ("Happiness", 10)},
-    1: {"type": "positive", "message": "You were able to cook breakfast.", "cost": ("Position", 2)},
+    0: {"type": "positive", "message": "You went to an amusement park with your family and gained 5 happiness 5 position.", "cost": (5, 5)},
+    1: {"type": "positive", "message": "You went to the movies with your friends and gained 5 happiness and 2 position.", "cost": (5, 2)},
+    2: {"type": "positive", "message": "You went to your favorite concert and gained 5 happiness and 2 position.", "cost": (5, 2)},
+    3: {"type": "positive", "message": "You went to a baseball game and gained 5 happiness and 2 position.", "cost": (5, 2)},
+    4: {"type": "positive", "message": "You had enough energy to clean the house and gained 5 happiness and 2 position.", "cost": (5, 2)},
 
     # Negative Events
-    2: {"type": "negative", "message": "You were not able to rest", "cost": ("Happiness", -10)},
-    3: {"type": "negative", "message": "Your symptoms got worse.", "cost": ("Position", -2)},
+    5: {"type": "negative", "message": "You weren't able to sleep last night, so you woke up tired and lost 5 happiness and 2 position.", "cost": (-5, -2)},
+    6: {"type": "negative", "message": "Your weren't able to do anything because your back pain increased and lost 5 happiness and 4 position.", "cost": (-5, -4)},
+    7: {"type": "negative", "message": "You went grocery shopping and lost 0 happiness and 1 position.", "cost": (0, -1)},
+    8: {"type": "negative", "message": "You suddenly had a migraine and lost 5 happiness and 5 position.", "cost": (-5, -5)},
+    9: {"type": "negative", "message": "You were too tired to cook, so you didn't eat and lost 5 happiness and 5 position.", "cost": (-5, -5)},
 
     # Start
-    4: {"type": "start", "message": "You have just started your last month of university when you have suddenly developed symptoms of some unknown cause.", "cost": None},
+    10: {"type": "start", "message": "Some intro message...", "cost": None},
 
     # End
-    55: {"type": "end", "message": "You were able to finish your last month and graduate!", "cost": None}
+    11: {"type": "end", "message": "End Message...", "cost": None}
 }
+
+"""Visualizations"""
+NAMES = ['Player1','Player2']
 #</COMMON_DATA>
 
 #<COMMON_CODE>
@@ -216,22 +224,27 @@ class State():
     # Produces a textual description of a state.
 
     txt = "\n"
+
     # Case 1: When it is the next player's turn.
-    if self.d['currentRoll'] is not None:
+    if self.d['message'] != "":
         txt += "You rolled a " + str(self.d['currentRoll']) + ".\n"
         txt += str(self.d['message']) + "\n"
         for player_name, player_state in self.d["players"].items():
             if self.d['currentPlayer'] != player_name:
                 txt += "You now have " + str(player_state.d['happiness']) + " happiness "
-                txt += "and are at position " + str(player_state.d['position']) + " on the board \n \n"
+                txt += "and are at position " + str(player_state.d['position'] + 1) + " on the board. \n \n"
         txt += "It is now " + str(self.d['currentPlayer']) + "'s turn. \n"
     else:
        # Case 2: When there is no previous player
+       # Start State
+       message = self.grab_slot_values("start")
+       txt += str(message['message']) + "\n"
+    
        txt += "It is " + str(self.d['currentPlayer']) + "'s turn. \n"
        for player_name, player_state in self.d["players"].items():
             if self.d['currentPlayer'] == player_name:
                 txt += "You have " + str(player_state.d['happiness']) + " happiness "
-                txt += "and are at position " + str(player_state.d['position']) + " on the board \n \n"
+                txt += "and are at position " + str(player_state.d['position'] + 1) + " on the board. \n \n"
     return txt
 
   def __hash__(self):
@@ -247,6 +260,9 @@ class State():
   def can_move(self):
     # Precondition function for the operator: Roll a Dice
     self.d['currentRoll'] = r.randint(1, 6)
+    for player, state in self.d['players'].items():
+        if self.current_position(player) == BOARD_LENGTH:
+            return False
     return True
 
   def move(self):
@@ -273,19 +289,17 @@ class State():
         current_player_idx += 1
 
     next_player_idx = (current_player_idx + 1) % 2
-    self.d['currentPlayer'] =  list(self.d['players'].keys())[next_player_idx]
+    self.d['currentPlayer'] = list(self.d['players'].keys())[next_player_idx]
 
   def current_player_slot_type(self):
     # Finds the slot type the current player is on.
-    player_position = self.current_position()
+    player_position = self.current_position(self.d['currentPlayer'])
     slot_type = self.d['board'][player_position]
     return slot_type
 
   # Should probably move these methods into PlayerState.
-  def current_position(self):
-    # Finds the current position of the current player.
-    current_player = self.d['currentPlayer']
-    return self.d['players'][current_player].d['position']
+  def current_position(self, player):
+    return self.d['players'][player].d['position']
 
   def has_disability(self):
     # Finds the current position of the current player.
@@ -312,27 +326,35 @@ class State():
     current_player = self.d['currentPlayer']
     self.d['message'] = message['message']
 
-    # Updates the current state using the grabbed message.
-    if message['cost'][0] == 'happiness':
-        self.d["players"][current_player].d["happiness"] += message['cost'][1]
+    # Updates happiness of the player.
+    new_happiness = self.d["players"][current_player].d["happiness"] + message['cost'][0]
+    if new_happiness < 0: 
+        self.d["players"][current_player].d["happiness"] = 0
+    elif new_happiness > MAX_HAPPINESS:
+       self.d["players"][current_player].d["happiness"] = MAX_HAPPINESS
     else:
-        new_position = self.d["players"][current_player].d["position"] + message['cost'][1]
-        if new_position < 0:
-           self.d["players"][current_player].d["position"] = 0
-        elif new_position > BOARD_LENGTH:
-           self.d["players"][current_player].d["position"] = BOARD_LENGTH
-        else:
-           self.d["players"][current_player].d["position"] = new_position
+       self.d["players"][current_player].d["happiness"] = new_happiness
+    
+    # Updates position of the player.
+    new_position = self.d["players"][current_player].d["position"] + message['cost'][1]
+    if new_position < 0:
+       self.d["players"][current_player].d["position"] = 0
+    elif new_position > BOARD_LENGTH:
+       self.d["players"][current_player].d["position"] = BOARD_LENGTH
+    else:
+       self.d["players"][current_player].d["position"] = new_position
 
   def handle_empty_slot(self):
     # TODO
     self.d['message'] = "You landed on an empty slot."
 
   def handle_start(self):
-    self.d['message'] = self.grab_slot_values("start")
+    message = self.grab_slot_values("start")
+    self.d['message'] = message['message']
 
   def handle_end(self):
-    self.d['message'] = self.grab_slot_values("end")
+    message = self.grab_slot_values("end")
+    self.d['message'] = message['message']
 
   def handle_current_slot(self):
     slot_type = self.current_player_slot_type()
@@ -354,12 +376,47 @@ class State():
   def goal_message(self):
     self.next_player()
     return f"Congratulations to {self.d['currentPlayer']} for finishing the game!"
+  
+  """Visualization Methods"""
+  def get_happiness(self, player): 
+    return self.d["players"][player].d["happiness"]
+     
+SESSION = None
+INACTIVE_PLAYERS = None
 
+def next_player(k, inactive_ok=False):
+  if SESSION==None: return 0 # Roles not ready
+  search_count = 0
+  while True:
+    k = (k + 1) % 6
+    #if ROLE_BEING_PLAYED[k]:
+    if len((SESSION['ROLES_MEMBERSHIP'])[k])>0:
+      if k in INACTIVE_PLAYERS:
+        if inactive_ok: return k
+      else: return k
+    search_count += 1
+    if search_count < 1:
+      print("Nobody is playing today.\n")
+      raise Exception("No players available in function: next_player.")
+
+def is_user_in_role(role_no):
+  username = SESSION['USERNAME']
+  rm = SESSION['ROLES_MEMBERSHIP']
+  if rm==None: return False
+  users_in_role = rm[role_no]
+  return username in users_in_role
+
+def get_session():
+  return SESSION
+
+def goal_message(self):
+  self.next_player()
+  return f"Congratulations to {self.d['currentPlayer']} for finishing the game!"
 #<COMMON_CODE>
 
 #<ROLES>
-ROLES = [{'name': 'Disabled', 'min': 1, 'max': 1},
-         {'name': 'Able-Bodied', 'min': 1, 'max': 1},
+ROLES = [{'name': 'Player1', 'min': 1, 'max': 1},
+         {'name': 'Player2', 'min': 1, 'max': 1},
          {'name': 'Observer', 'min': 0, 'max': 25}
          ]
 #</ROLES>
@@ -379,15 +436,23 @@ class Operator:
 
 OPERATORS = [Operator(
     "Roll a dice: ",
-    lambda s: s.can_move(),
-    lambda s: s.move())]
+    lambda s, role=0: s.can_move(),
+    lambda s, role=0: s.move())]
 
 #</OPERATORS>
 
+#<GOAL_TEST> (optional)
+GOAL_TEST = lambda s: goal_test(s)
+#</GOAL_TEST>
+
+#<GOAL_MESSAGE_FUNCTION> (optional)
+GOAL_MESSAGE_FUNCTION = lambda s: goal_message(s)
+#</GOAL_MESSAGE_FUNCTION>
+
 #<STATE_VIS>
-BRIFL_SVG = True # The program FoxAndGeese_SVG_VIS_FOR_BRIFL.py is available
+BRIFL_SVG = True
 render_state = None
 def use_BRIFL_SVG():
   global render_state
-  from  DisabilitySimulator_SVG_VIS_FOR_BRIFL import render_state
+  from DisabilitySimulator_SVG_VIS_FOR_BRIFL import render_state
 #</STATE_VIS>

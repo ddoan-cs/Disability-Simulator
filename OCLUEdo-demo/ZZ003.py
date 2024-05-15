@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3.6
 #!/usr/bin/python3
 '''ZZ003.py
 a successor to SZ001.py, and ZZ002.py.
@@ -75,7 +74,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, \
    # that might better be hidden from players during a game.
 DEBUG = False
 
-HOST = 'tempura.cs.washington.edu'
+HOST = 'localhost'
 PORT = 5000 # Default port, overridden by optional command-line arg.
 
 import os
