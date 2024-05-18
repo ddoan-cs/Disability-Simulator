@@ -17,8 +17,8 @@ IMAGE_WIDTH = 200 # Just a guess
 IMAGE_HEIGHT = 350 # "   "   "
 
 ROLE_COLOR = [
-    "rgb(100, 100, 150)", 
-    "rgb(150, 100, 100)", 
+    "rgb(100, 100, 150)",
+    "rgb(150, 100, 100)",
     "rgb(150, 150, 150)"] # no-role or observer: darker gray.
 
 # Gradient colors for different slot types
@@ -47,9 +47,9 @@ def render_state(s, roles=None):
                      fill = "red"))
     else:
         index = 0
-        if s.d['currentPlayer'] == "Player1": 
+        if s.d['currentPlayer'] == "Player1":
             index = 0
-        else: 
+        else:
             index = 1
         #for role in roles:
         dwg.add(dwg.rect(insert = (0,0),
@@ -77,7 +77,7 @@ def render_state(s, roles=None):
             y = i // ROWS * space_width
             slot_type = s.d['board'].get(i, SlotType.EMPTY)
             gradient_id = "grad_" + slot_type.name
-        
+
             # Draw the main block with gradient fill
             dwg.add(dwg.rect(insert=(x + 5, y + 75),
                         size=(str(space_width) + "px", str(space_width) + "px"),
@@ -92,15 +92,15 @@ def render_state(s, roles=None):
             if i == position:
                 dwg.add(dwg.circle(center=(x + 5 + space_width/2, y + 75 + space_width/2),
                            r=space_width/4,
-                           fill=ROLE_COLOR[index]))  
-      
+                           fill=ROLE_COLOR[index]))
+
         label = "It is now " + NAMES[roles[index]] + "'s turn."
         x = 350; y = 100
         dwg.add(dwg.text(label, insert = (x+HALF_SQW, y-THREE_QUARTER_SQW),
                      text_anchor="middle",
                      font_size="25",
                      stroke = "black",
-                     fill = "black"))  
+                     fill = "black"))
 
         # Add legend
         legend_x = 20
@@ -125,10 +125,18 @@ def render_state(s, roles=None):
 
             legend_y += legend_height + 5
 
+    dynamic_text(alpha_v2.State.__str__(s), dwg)
+
     svg_string = dwg.tostring()
 
     #print("svg_string is "); print(svg_string)    return svg_string
     return svg_string
+
+def dynamic_text(str, dwg):
+    dwg.add(dwg.text(str, insert = (150, 430),
+        font_size="12",
+        stroke = "black",
+        fill = "black"))
 
 if __name__ == '__main__':
     DEBUG = True
