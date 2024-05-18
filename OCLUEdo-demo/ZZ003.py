@@ -74,7 +74,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, \
    # that might better be hidden from players during a game.
 DEBUG = False
 
-HOST = 'localhost'
+HOST = 'tempura.cs.washington.edu'
 PORT = 5000 # Default port, overridden by optional command-line arg.
 
 import os
@@ -629,5 +629,5 @@ def make_all_inapplicable():
 if __name__ == '__main__':
     load_the_problem_formulation_and_port()
     print("FlaskSOLUZION is Listening at "+HOST+":"+str(PORT))
-#    socketio.run(app, host=HOST, port=PORT, debug=DEBUG)
+    # socketio.run(app, host=HOST, port=PORT, debug=DEBUG)
     socketio.run(app, host='0.0.0.0', port=PORT, debug=DEBUG)

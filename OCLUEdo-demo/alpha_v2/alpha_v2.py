@@ -29,6 +29,7 @@ MAX_HAPPINESS = 100
 
 
 """Board"""
+# Board Length should be length - 1. 
 BOARD_LENGTH = 23
 from enum import Enum
 
@@ -42,34 +43,6 @@ class SlotType(Enum):
     # Should consider this when moving to the FLASK client.
     START = "start"
     END = "end"
-
-# This represents a 24-space game board.
-POSITIONS = {
-    0: SlotType.START,
-    1: SlotType.EMPTY,
-    2: SlotType.EVENT,
-    3: SlotType.EVENT,
-    4: SlotType.EMPTY,
-    5: SlotType.EMPTY,
-    6: SlotType.EVENT,
-    7: SlotType.EMPTY,
-    8: SlotType.EMPTY,
-    9: SlotType.EVENT,
-    10: SlotType.EMPTY,
-    11: SlotType.EVENT,
-    12: SlotType.EMPTY,
-    13: SlotType.EVENT,
-    14: SlotType.EMPTY,
-    15: SlotType.EMPTY,
-    16: SlotType.EVENT,
-    17: SlotType.EMPTY,
-    18: SlotType.EVENT,
-    19: SlotType.EMPTY,
-    20: SlotType.EVENT,
-    21: SlotType.EMPTY,
-    22: SlotType.EMPTY,
-    23: SlotType.END
-}
 
 """Slot Values"""
 SLOTS = {
@@ -207,11 +180,21 @@ class State():
         players_states = {f"Player{i+1}": PlayerState(f"Player{i+1}") for i in range(2)}
 
         d = {'currentPlayer' : "Player1",
-           'board' : POSITIONS,
+           'board' : {},
            'players' : players_states,
            'message' : "",
            'currentRoll' : None
         }
+
+        for i in range(BOARD_LENGTH):
+          if i == 0:
+              d['board'][i] = SlotType.START
+          elif i == BOARD_LENGTH:
+              d['board'][i] = SlotType.END
+          elif r.random() < 0.4: 
+              d['board'][i] = SlotType.EVENT
+          else:
+              d['board'][i] = SlotType.EMPTY
 
     self.d = d
 

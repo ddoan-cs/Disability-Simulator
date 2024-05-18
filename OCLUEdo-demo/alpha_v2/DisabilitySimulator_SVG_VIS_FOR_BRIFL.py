@@ -71,10 +71,10 @@ def render_state(s, roles=None):
 
         # Generate the board
         space_width = int(W / 8)
-        for i in range(24):
+        for i in range(BOARD_LENGTH + 1):
             x = i % 8 * space_width
             y = i // 8 * space_width
-            slot_type = POSITIONS.get(i, SlotType.EMPTY)
+            slot_type = s.d['board'].get(i, SlotType.EMPTY)
             gradient_id = "grad_" + slot_type.name
         
             # Draw the main block with gradient fill
