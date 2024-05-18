@@ -70,26 +70,27 @@ def render_state(s, roles=None):
             dwg.defs.add(gradient)
 
         # Generate the board
-        space_width = int(W / 8)
+        ROWS = 20
+        space_width = int(W / ROWS)
         for i in range(BOARD_LENGTH):
-            x = i % 8 * space_width
-            y = i // 8 * space_width
+            x = i % ROWS * space_width
+            y = i // ROWS * space_width
             slot_type = s.d['board'].get(i, SlotType.EMPTY)
             gradient_id = "grad_" + slot_type.name
         
             # Draw the main block with gradient fill
-            dwg.add(dwg.rect(insert=(x, y + 75),
+            dwg.add(dwg.rect(insert=(x + 5, y + 75),
                         size=(str(space_width) + "px", str(space_width) + "px"),
                         stroke_width="1",
                         stroke="black",
                         fill="url(#" + gradient_id + ")"))
 
             # Add board position text
-            dwg.add(dwg.text(str(i + 1), insert=(x + 5, y + 75 + 20), fill="black", font_size="12px"))
+            dwg.add(dwg.text(str(i + 1), insert=(x + 8, y + 75 + 10), fill="black", font_size="8px"))
 
             # Add a marker at the player's position
             if i == position:
-                dwg.add(dwg.circle(center=(x + space_width/2, y + 75 + space_width/2),
+                dwg.add(dwg.circle(center=(x + 5 + space_width/2, y + 75 + space_width/2),
                            r=space_width/4,
                            fill=ROLE_COLOR[index]))  
       
