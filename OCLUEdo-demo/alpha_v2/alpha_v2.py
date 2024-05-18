@@ -29,8 +29,9 @@ MAX_HAPPINESS = 100
 
 
 """Board"""
-# Board Length should be length - 1. 
-BOARD_LENGTH = 23
+# Board Length should be length. 
+BOARD_LENGTH = 24
+
 from enum import Enum
 
 class SlotType(Enum):
@@ -189,7 +190,7 @@ class State():
         for i in range(BOARD_LENGTH):
           if i == 0:
               d['board'][i] = SlotType.START
-          elif i == BOARD_LENGTH:
+          elif i == BOARD_LENGTH - 1:
               d['board'][i] = SlotType.END
           elif r.random() < 0.4: 
               d['board'][i] = SlotType.EVENT
@@ -244,7 +245,7 @@ class State():
     # Precondition function for the operator: Roll a Dice
     self.d['currentRoll'] = r.randint(1, 6)
     for player, state in self.d['players'].items():
-        if self.current_position(player) == BOARD_LENGTH:
+        if self.current_position(player) == BOARD_LENGTH - 1:
             return False
     return True
 
@@ -254,8 +255,8 @@ class State():
     current_player = news.d['currentPlayer']
     for player, state in news.d['players'].items():
         if player == current_player:
-            if (state.d['position'] + self.d['currentRoll']) >= BOARD_LENGTH:
-               state.d['position'] = BOARD_LENGTH
+            if (state.d['position'] + self.d['currentRoll']) >= BOARD_LENGTH - 1:
+               state.d['position'] = BOARD_LENGTH - 1
             else:
                state.d['position'] += self.d['currentRoll']
 
@@ -322,8 +323,8 @@ class State():
     new_position = self.d["players"][current_player].d["position"] + message['cost'][1]
     if new_position < 0:
        self.d["players"][current_player].d["position"] = 0
-    elif new_position > BOARD_LENGTH:
-       self.d["players"][current_player].d["position"] = BOARD_LENGTH
+    elif new_position > BOARD_LENGTH - 1:
+       self.d["players"][current_player].d["position"] = BOARD_LENGTH - 1
     else:
        self.d["players"][current_player].d["position"] = new_position
 
@@ -353,7 +354,7 @@ class State():
         raise ValueError(f"Unknown slot type: {slot_type}")
 
   def is_goal(self):
-    return any(player_state.d["position"] == BOARD_LENGTH for player_state in self.d["players"].values())
+    return any(player_state.d["position"] == BOARD_LENGTH - 1 for player_state in self.d["players"].values())
 
   # Since the current player is advanced on the operator, the winner should be the previous player.
   def goal_message(self):

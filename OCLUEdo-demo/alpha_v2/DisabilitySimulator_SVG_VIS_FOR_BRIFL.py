@@ -71,7 +71,7 @@ def render_state(s, roles=None):
 
         # Generate the board
         space_width = int(W / 8)
-        for i in range(BOARD_LENGTH + 1):
+        for i in range(BOARD_LENGTH):
             x = i % 8 * space_width
             y = i // 8 * space_width
             slot_type = s.d['board'].get(i, SlotType.EMPTY)
