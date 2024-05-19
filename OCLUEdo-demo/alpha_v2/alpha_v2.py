@@ -29,7 +29,7 @@ MAX_HAPPINESS = 100
 
 
 """Board"""
-# Board Length should be length. 
+# Board Length should be length.
 BOARD_LENGTH = 100
 
 from enum import Enum
@@ -159,7 +159,7 @@ class State():
               d['board'][i] = SlotType.START
           elif i == BOARD_LENGTH - 1:
               d['board'][i] = SlotType.END
-          elif r.random() < 0.4: 
+          elif r.random() < 0.4:
               d['board'][i] = SlotType.EVENT
           else:
               d['board'][i] = SlotType.EMPTY
@@ -190,7 +190,7 @@ class State():
        # Start State
        message = self.grab_slot_values("start")
        txt += str(message['message']) + "\n"
-    
+
        txt += "It is " + str(self.d['currentPlayer']) + "'s turn. \n"
        for player_name, player_state in self.d["players"].items():
             if self.d['currentPlayer'] == player_name:
@@ -207,7 +207,7 @@ class State():
     for prop in self.d.keys():
         news.d[prop] = self.d[prop]
     return news
-  
+
   def is_goal(self):
     return any(player_state.d["position"] == BOARD_LENGTH - 1 for player_state in self.d["players"].values())
 
@@ -248,13 +248,13 @@ class State():
 
     # Updates happiness of the player.
     new_happiness = self.d["players"][current_player].d["happiness"] + message['cost'][0]
-    if new_happiness < 0: 
+    if new_happiness < 0:
         self.d["players"][current_player].d["happiness"] = 0
     elif new_happiness > MAX_HAPPINESS:
        self.d["players"][current_player].d["happiness"] = MAX_HAPPINESS
     else:
        self.d["players"][current_player].d["happiness"] = new_happiness
-    
+
     # Updates position of the player.
     new_position = self.d["players"][current_player].d["position"] + message['cost'][1]
     if new_position < 0:
@@ -287,17 +287,17 @@ class State():
         self.handle_end()
     else:
         raise ValueError(f"Unknown slot type: {slot_type}")
-  
+
   """Visualization Methods"""
-  def get_happiness(self, player): 
+  def get_happiness(self, player):
     return self.d["players"][player].d["happiness"]
-     
+
 
 def can_move(s, role):
   # Precondition function for the operator: Roll a Dice
-  if not s.d['currentPlayer'] == role: 
+  if not s.d['currentPlayer'] == role:
       return False
-    
+
   s.d['currentRoll'] = r.randint(1, 6)
   for player, state in s.d['players'].items():
       if s.current_position(player) == BOARD_LENGTH - 1:
@@ -318,7 +318,7 @@ def move(s, role):
   news.handle_current_slot()
   news.d['currentPlayer'] = next_player(news.d['currentPlayer'], )
   return news
-    
+
 SESSION = None
 
 def next_player(k):

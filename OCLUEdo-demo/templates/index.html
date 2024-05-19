@@ -15,7 +15,7 @@
       .td_center { text-align: center;
       }
       #username_display {
-      font-weight: bold; color: #000077; 
+      font-weight: bold; color: #000077;
       }
       div {
 	  vertical-align: middle;
@@ -27,7 +27,7 @@
 
 <link rel="shortcut icon" href="{{url_for('get_image', image_filename='favicon.png')}}">
 
-<!--    
+<!--
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
   -->
 <script src="{{url_for('static', filename='socket.io.min.js')}}"></script>
@@ -76,13 +76,13 @@ function show_updates(data) { // Function to populate all the problem and state-
             }
           }
 
-function send_command(c) {  // Used as soon as the page is loaded, 
+function send_command(c) {  // Used as soon as the page is loaded,
                             // to get the problem and initial state info.
     socket.emit('command', {'command': c, 'username': username});
 }
 
 $(function() {
-    $('a#send_command').bind('click', function() { 
+    $('a#send_command').bind('click', function() {
         $.getJSON('/_command', {    // Used during interaction.
         command: $('input[name="command"]').val()
       },
@@ -110,7 +110,7 @@ $(function() {
      function setUsername () {
      var usernameInput = $('.usernameInput'); // Input for username
      username = cleanInput(usernameInput.val().trim());
- 
+
      // Tell the server your username
      socket.emit('add user', username);
 
@@ -161,7 +161,7 @@ socket.on('alert', function(data) {
 socket.on('session_owner', function(data) {
  session_owner = data['session_owner'];
  $("#session_owner").html("The session owner is <b>" + session_owner + "</b>");
- if (username == session_owner) { enable_owners_panel() } 
+ if (username == session_owner) { enable_owners_panel() }
  } )
 
 socket.on('show_help', function(data) {
@@ -184,7 +184,7 @@ socket.on('game_started', function(data) {
 socket.on('error', function(data) {
     alert(data['message']+data['event']);
 })
-  
+
 //function enable_start_button() {
 //  $("#startdiv").html('<button onClick="request_start()">START THE SESSION!</button>');
 //}
@@ -272,7 +272,7 @@ function render_roles() {
     var notavail = (! role_is_mine) && (r['current']==r['max'])
     var LQbutton = ''
     if (notavail) { bgcolor = notavailcolor }
-    else { LQbutton = 
+    else { LQbutton =
       '<button class="role_JL_button" onClick="join_or_leave('+i+')">'+label+'</button>'
       }
     var row_html = '<tr class="role_row" bgcolor="'+bgcolor+'"><td class="td_center">'+r['desc']+'</td>'+
@@ -297,8 +297,8 @@ function show_applicable_operators(data) {
        for (var j = 0; j < roles_data.length; j++) {
            var r = roles_data[j];
            var role_is_mine = in_list(username, r['who']);
-           if (role_is_mine) { 
-               if (data[j][i]) { op_is_applicable = true; 
+           if (role_is_mine) {
+               if (data[j][i]) { op_is_applicable = true;
                                  break;
                                }
            }
@@ -421,7 +421,7 @@ function toggle_about() {
 (users will have to sign in again)</button>
 </td></tr></table>
   </div>
- 
+
 <div id="startdiv"></div>
 
 <div id="roles_stub" style="visibility: hidden">roles stub (temporary)</div>
@@ -438,15 +438,15 @@ function toggle_about() {
 </table>
 </div>
 
-<div class="show_on_debug" id="state_as_text">
-  Current state as text (sometimes useful during debugging): 
+<!-- <div class="show_on_debug" id="state_as_text">
+  Current state as text (sometimes useful during debugging):
   <p id = "current_state">
     Current state goes here.
   (filled in as soon as the session owner clicks on the START button)
   </p>
   <p id = "stats">
   </p>
-</div>
+</div> -->
 <div id="state_vis">
     <svg id="state_svg" width="500" height="200">
       <defs /><rect fill="rgb(255,255,0)" height="100px" stroke="black" stroke-width="1" width="400px" x="50" y="50" /><text x="125" y="110">Welcome to SOLUZION!</text>

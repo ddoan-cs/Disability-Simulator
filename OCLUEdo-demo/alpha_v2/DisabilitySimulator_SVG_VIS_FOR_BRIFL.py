@@ -4,7 +4,7 @@
 # Python version 3.x
 
 import svgwrite
-from alpha_v2 import * #State, 
+from alpha_v2 import * #State,
 import alpha_v2
 
 DEBUG = False
@@ -99,6 +99,13 @@ def render_state(s, roles=None):
                      stroke = "black",
                      fill = "black"))
 
+        player = s.d['players'][role]
+        happiness = "Happiness: " + str(player.d['happiness'])
+        dwg.add(dwg.text(happiness, insert = (600, y-THREE_QUARTER_SQW),
+                     font_size="25",
+                     stroke = "black",
+                     fill = "black"))
+
         # Add legend
         legend_x = 20
         legend_y = 430
@@ -136,7 +143,7 @@ def dynamic_text(str, dwg):
         fill = "black"))
 
 if __name__ == '__main__':
-    DEBUG = True
+    DEBUG = False
     session = {'HOST': 'tempura.cs.washington.edu', 'PORT':5000}
     INITIAL_STATE = State()
     print(INITIAL_STATE)
