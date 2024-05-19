@@ -137,10 +137,13 @@ def render_state(s, roles=None):
     return svg_string
 
 def dynamic_text(str, dwg):
-    dwg.add(dwg.text(str, insert = (150, 430),
-        font_size="12",
-        stroke = "black",
-        fill = "black"))
+    txt = str.split("\n")
+    print(txt)
+    for i, message in enumerate(txt):
+        dwg.add(dwg.text(message, insert = (150, 430 + i*30),
+            font_size="12",
+            stroke = "black",
+            fill = "black"))
 
 if __name__ == '__main__':
     DEBUG = False
