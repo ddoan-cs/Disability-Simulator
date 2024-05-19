@@ -30,7 +30,7 @@ MAX_HAPPINESS = 100
 
 """Board"""
 # Board Length should be length. 
-BOARD_LENGTH = 24
+BOARD_LENGTH = 100
 
 from enum import Enum
 
@@ -136,51 +136,18 @@ class PlayerState():
         news.d[prop] = self.d[prop]
     return news
 
-#<INITIAL_STATE>
-INITIAL_STATE = None
-import random
-
-
-def create_initial_state():
-  global INITIAL_STATE
-  # setup()
-  INITIAL_STATE = State()
-  print(INITIAL_STATE)
-#</INITIAL_STATE>
-
 class State():
   """Represents the state of the game.
 
     Each State instance includes properties such as the current player, the game board layout,
     player states (including their happiness, position, and disability status),
     the current message for the player, and the result of the last dice roll.
-
-    Methods:
-    - __init__(self, d=None): Initializes a State instance with default values if no dictionary is provided.
-    - __eq__(self, s2): Compares two State instances for equality based on their property values.
-    - __str__(self): Returns a textual description of a State instance.
-    - __hash__(self): Generates a hash value for a State instance.
-    - __copy__(self): Creates a deep copy of a State instance.
-    - can_move(self): Precondition function for the operator: Roll a Dice.
-    - move(self): Transformation function for the operator: Roll a Dice.
-    - next_player(self): Updates the state to the next player.
-    - current_player_slot_type(self): Finds the slot type the current player is on.
-    - current_position(self): Finds the current position of the current player.
-    - has_disability(self): Checks if the current player has a disability.
-    - grab_slot_values(self, slot_type): Grabs the values of the slots.
-    - handle_event(self): Handles the event based on the current player's disability status.
-    - handle_empty_slot(self): Handles an empty slot.
-    - handle_start(self): Handles the start slot.
-    - handle_end(self): Handles the end slot.
-    - handle_current_slot(self): Handles the current slot the player is on.
-    - is_goal(self): Checks if any player has reached the goal position.
-    - goal_message(self): Generates a message for the winning player.
   """
   def __init__(self, d=None):
     if d==None:
-        players_states = {f"Player{i+1}": PlayerState(f"Player{i+1}") for i in range(2)}
+        players_states = {i: PlayerState(i) for i in range(2)}
 
-        d = {'currentPlayer' : "Player1",
+        d = {'currentPlayer' : 0,
            'board' : {},
            'players' : players_states,
            'message' : "",
@@ -240,40 +207,9 @@ class State():
     for prop in self.d.keys():
         news.d[prop] = self.d[prop]
     return news
-
-  def can_move(self):
-    # Precondition function for the operator: Roll a Dice
-    self.d['currentRoll'] = r.randint(1, 6)
-    for player, state in self.d['players'].items():
-        if self.current_position(player) == BOARD_LENGTH - 1:
-            return False
-    return True
-
-  def move(self):
-    # Transformation function for the operator: Roll a Dice
-    news = self.__copy__()
-    current_player = news.d['currentPlayer']
-    for player, state in news.d['players'].items():
-        if player == current_player:
-            if (state.d['position'] + self.d['currentRoll']) >= BOARD_LENGTH - 1:
-               state.d['position'] = BOARD_LENGTH - 1
-            else:
-               state.d['position'] += self.d['currentRoll']
-
-    news.handle_current_slot()
-    news.next_player()
-    return news
-
-  def next_player(self):
-    # Updates the state to the next player.
-    current_player_idx = 0
-    for player, state in self.d['players'].items():
-        if player == self.d['currentPlayer']:
-            break
-        current_player_idx += 1
-
-    next_player_idx = (current_player_idx + 1) % 2
-    self.d['currentPlayer'] = list(self.d['players'].keys())[next_player_idx]
+  
+  def is_goal(self):
+    return any(player_state.d["position"] == BOARD_LENGTH - 1 for player_state in self.d["players"].values())
 
   def current_player_slot_type(self):
     # Finds the slot type the current player is on.
@@ -329,7 +265,6 @@ class State():
        self.d["players"][current_player].d["position"] = new_position
 
   def handle_empty_slot(self):
-    # TODO
     self.d['message'] = "You landed on an empty slot."
 
   def handle_start(self):
@@ -352,34 +287,50 @@ class State():
         self.handle_end()
     else:
         raise ValueError(f"Unknown slot type: {slot_type}")
-
-  def is_goal(self):
-    return any(player_state.d["position"] == BOARD_LENGTH - 1 for player_state in self.d["players"].values())
-
-  # Since the current player is advanced on the operator, the winner should be the previous player.
-  def goal_message(self):
-    self.next_player()
-    return f"Congratulations to {self.d['currentPlayer']} for finishing the game!"
   
   """Visualization Methods"""
   def get_happiness(self, player): 
     return self.d["players"][player].d["happiness"]
      
-SESSION = None
-INACTIVE_PLAYERS = None
 
-def next_player(k, inactive_ok=False):
+def can_move(s, role):
+  # Precondition function for the operator: Roll a Dice
+  if not s.d['currentPlayer'] == role: 
+      return False
+    
+  s.d['currentRoll'] = r.randint(1, 6)
+  for player, state in s.d['players'].items():
+      if s.current_position(player) == BOARD_LENGTH - 1:
+          return False
+  return True
+
+def move(s, role):
+  # Transformation function for the operator: Roll a Dice
+  news = s.__copy__()
+  current_player = news.d['currentPlayer']
+  for player, state in news.d['players'].items():
+      if player == current_player:
+          if (state.d['position'] + s.d['currentRoll']) >= BOARD_LENGTH - 1:
+            state.d['position'] = BOARD_LENGTH - 1
+          else:
+            state.d['position'] += s.d['currentRoll']
+
+  news.handle_current_slot()
+  news.d['currentPlayer'] = next_player(news.d['currentPlayer'], )
+  return news
+    
+SESSION = None
+
+def next_player(k):
   if SESSION==None: return 0 # Roles not ready
   search_count = 0
   while True:
-    k = (k + 1) % 6
+    k = (k + 1) % 2
     #if ROLE_BEING_PLAYED[k]:
     if len((SESSION['ROLES_MEMBERSHIP'])[k])>0:
-      if k in INACTIVE_PLAYERS:
-        if inactive_ok: return k
-      else: return k
+      return k
     search_count += 1
-    if search_count < 1:
+    if search_count > 2:
       print("Nobody is playing today.\n")
       raise Exception("No players available in function: next_player.")
 
@@ -397,6 +348,14 @@ def goal_message(self):
   self.next_player()
   return f"Congratulations to {self.d['currentPlayer']} for finishing the game!"
 #<COMMON_CODE>
+
+#<INITIAL_STATE>
+INITIAL_STATE = None
+def create_initial_state():
+  global INITIAL_STATE
+  INITIAL_STATE = State()
+  print(INITIAL_STATE)
+#</INITIAL_STATE>
 
 #<ROLES>
 ROLES = [{'name': 'Player1', 'min': 1, 'max': 1},
@@ -420,8 +379,8 @@ class Operator:
 
 OPERATORS = [Operator(
     "Roll a dice: ",
-    lambda s, role=0: s.can_move(),
-    lambda s, role=0: s.move())]
+    lambda s, role=0: can_move(s, role),
+    lambda s, role=0: move(s, role))]
 
 #</OPERATORS>
 

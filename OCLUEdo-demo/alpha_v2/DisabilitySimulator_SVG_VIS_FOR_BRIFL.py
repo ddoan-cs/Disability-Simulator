@@ -4,7 +4,7 @@
 # Python version 3.x
 
 import svgwrite
-from alpha_v2 import * #State,
+from alpha_v2 import * #State, 
 import alpha_v2
 
 DEBUG = False
@@ -46,20 +46,17 @@ def render_state(s, roles=None):
                      font_size="25",
                      fill = "red"))
     else:
-        index = 0
-        if s.d['currentPlayer'] == "Player1":
-            index = 0
-        else:
-            index = 1
+        role = 0
+        if s.d['currentPlayer'] == 1:
+            role = 1
         #for role in roles:
         dwg.add(dwg.rect(insert = (0,0),
                      size = (str(W)+"px", str(H)+"px"),
                      stroke_width = "1",
                      stroke = "black",
-                     fill = ROLE_COLOR[roles[index]]))
+                     fill = ROLE_COLOR[role]))
 
-        position = s.current_position(NAMES[roles[(index + 1) % 2]])
-
+        position = s.current_position((role + 1) % 2)
 
         # Define gradients for each SlotType
         for slot_type, colors in SLOT_GRADIENT_COLORS.items():
@@ -92,9 +89,9 @@ def render_state(s, roles=None):
             if i == position:
                 dwg.add(dwg.circle(center=(x + 5 + space_width/2, y + 75 + space_width/2),
                            r=space_width/4,
-                           fill=ROLE_COLOR[index]))
+                           fill=ROLE_COLOR[role]))
 
-        label = "It is now " + NAMES[roles[index]] + "'s turn."
+        label = "It is now " + NAMES[role] + "'s turn."
         x = 350; y = 100
         dwg.add(dwg.text(label, insert = (x+HALF_SQW, y-THREE_QUARTER_SQW),
                      text_anchor="middle",
