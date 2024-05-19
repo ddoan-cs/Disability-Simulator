@@ -53,25 +53,57 @@ SLOTS = {
     #        }
     # cost: ("Happiness, Position")
 
+    # Start
+    0: {"type": "start", "message": "Welcome to your journey! Your choices will affect your happiness and position. Choose wisely and enjoy the ride.", "cost": None},
+
     # Positive Events
-    0: {"type": "positive", "message": "You went to an amusement park with your family and gained 5 happiness 5 position.", "cost": (5, 5)},
-    1: {"type": "positive", "message": "You went to the movies with your friends and gained 5 happiness and 2 position.", "cost": (5, 2)},
-    2: {"type": "positive", "message": "You went to your favorite concert and gained 5 happiness and 2 position.", "cost": (5, 2)},
-    3: {"type": "positive", "message": "You went to a baseball game and gained 5 happiness and 2 position.", "cost": (5, 2)},
-    4: {"type": "positive", "message": "You had enough energy to clean the house and gained 5 happiness and 2 position.", "cost": (5, 2)},
+    1: {"type": "positive", "message": "You went to an amusement park with your family and gained 5 happiness and 5 position.", "cost": ((5, 5), (5, 4))},
+    2: {"type": "positive", "message": "You went to the movies with your friends and gained 5 happiness and 2 position.", "cost": ((5, 2), (5, 1))},
+    3: {"type": "positive", "message": "You went to your favorite concert and gained 5 happiness and 2 position.", "cost": ((5, 2), (5, 1))},
+    4: {"type": "positive", "message": "You went to a baseball game and gained 5 happiness and 2 position.", "cost": ((5, 2), (5, 1))},
+    5: {"type": "positive", "message": "You had enough energy to clean the house and gained 5 happiness and 2 position.", "cost": ((5, 2), (5, 1))},
+    6: {"type": "positive", "message": "You received a compliment on your report and gained 3 happiness and 3 position.", "cost": ((3, 3), (3, 2))},
+    7: {"type": "positive", "message": "You helped a friend move and gained 4 happiness and 1 position.", "cost": ((4, 1), (4, 0))},
+    8: {"type": "positive", "message": "You volunteered at a local charity and gained 4 happiness and 3 position.", "cost": ((4, 3), (4, 2))},
+    9: {"type": "positive", "message": "You had a relaxing day at the spa and gained 5 happiness and 1 position.", "cost": ((5, 1), (5, 0))},
+    10: {"type": "positive", "message": "You completed a challenging project and gained 6 happiness and 4 position.", "cost": ((6, 4), (6, 3))},
+    11: {"type": "positive", "message": "You hung out with friends on a Saturday evening and gained 2 happiness and 1 position.", "cost": ((2, 1), (2, 0))},
+    12: {"type": "positive", "message": "You attended a friend's wedding and gained 4 happiness and 3 position.", "cost": ((4, 3), (4, 2))},
+    13: {"type": "positive", "message": "You hosted a game night and gained 3 happiness and 2 position.", "cost": ((3, 2), (3, 1))},
+    14: {"type": "positive", "message": "You joined a new club and gained 3 happiness and 2 position.", "cost": ((3, 2), (3, 1))},
+    15: {"type": "positive", "message": "You attended a networking event and gained 2 happiness and 4 position.", "cost": ((2, 4), (2, 3))},
+    16: {"type": "positive", "message": "You had a refreshing shower and gained 2 happiness and 1 position.", "cost": ((2, 1), (2, 0))},
+    17: {"type": "positive", "message": "You finished all your laundry for the week and gained 4 happiness and 2 position.", "cost": ((4, 2), (4, 1))},
+    18: {"type": "positive", "message": "You played guitar and learned a new song, so you gained 5 happiness and 3 position.", "cost": ((5, 3), (5, 2))},
+    19: {"type": "positive", "message": "You took a day for self-care and gained 4 happiness and 2 position.", "cost": ((4, 2), (4, 1))},
+    20: {"type": "positive", "message": "You went to the gym yesterday and gained 1 happiness and 1 position.", "cost": ((1, 1), (1, 0))},
+    21: {"type": "positive", "message": "You got admitted as a teaching assistant for next quarter and gained 6 happiness and 5 position.", "cost": ((6, 5), (6, 4))},
 
     # Negative Events
-    5: {"type": "negative", "message": "You weren't able to sleep last night, so you woke up tired and lost 5 happiness and 2 position.", "cost": (-5, -2)},
-    6: {"type": "negative", "message": "Your weren't able to do anything because your back pain increased and lost 5 happiness and 4 position.", "cost": (-5, -4)},
-    7: {"type": "negative", "message": "You went grocery shopping and lost 0 happiness and 1 position.", "cost": (0, -1)},
-    8: {"type": "negative", "message": "You suddenly had a migraine and lost 5 happiness and 5 position.", "cost": (-5, -5)},
-    9: {"type": "negative", "message": "You were too tired to cook, so you didn't eat and lost 5 happiness and 5 position.", "cost": (-5, -5)},
-
-    # Start
-    10: {"type": "start", "message": "Some intro message...", "cost": None},
+    22: {"type": "negative", "message": "You weren't able to sleep last night, so you woke up tired and lost 5 happiness and 2 position.", "cost": ((-5, -2), (-5, -3))},
+    23: {"type": "negative", "message": "You weren't able to do anything because your back pain increased and lost 5 happiness and 4 position.", "cost": ((-5, -4), (-5, -5))},
+    24: {"type": "negative", "message": "You went grocery shopping and lost 0 happiness and 1 position.", "cost": ((0, -1), (0, -2))},
+    25: {"type": "negative", "message": "You suddenly had a migraine and lost 5 happiness and 5 position.", "cost": ((-5, -5), (-5, -6))},
+    26: {"type": "negative", "message": "You were too tired to cook, so you didn't eat and lost 5 happiness and 5 position.", "cost": ((-5, -5), (-5, -6))},
+    27: {"type": "negative", "message": "You got stuck in traffic for hours and lost 3 happiness and 2 position.", "cost": ((-3, -2), (-3, -3))},
+    28: {"type": "negative", "message": "You had a disagreement with a classmate and lost 4 happiness and 3 position.", "cost": ((-4, -3), (-4, -4))},
+    29: {"type": "negative", "message": "You missed an important deadline and lost 5 happiness and 4 position.", "cost": ((-5, -4), (-5, -5))},
+    30: {"type": "negative", "message": "You had a flat tire on the way to an event and lost 3 happiness and 1 position.", "cost": ((-3, -1), (-3, -2))},
+    31: {"type": "negative", "message": "You had a family argument and lost 4 happiness and 3 position.", "cost": ((-4, -3), (-4, -4))},
+    32: {"type": "negative", "message": "You skipped brushing your teeth and lost 1 happiness and 1 position.", "cost": ((-1, -1), (-1, -2))},
+    33: {"type": "negative", "message": "You were too tired to wash the dishes yesterday and lost 3 happiness and 2 position.", "cost": ((-3, -2), (-3, -3))},
+    34: {"type": "negative", "message": "You didn't have time to go to a concert due to headaches and lost 3 happiness and 1 position.", "cost": ((-3, -1), (-3, -2))},
+    35: {"type": "negative", "message": "You neglected self-care and lost 4 happiness and 3 position.", "cost": ((-4, -3), (-4, -4))},
+    36: {"type": "negative", "message": "You ate street food and got food poisoning and lost 3 happiness and 2 position.", "cost": ((-3, -2), (-3, -3))},
+    37: {"type": "negative", "message": "You failed an important exam and lost 4 happiness and 4 position.", "cost": ((-4, -4), (-4, -5))},
+    38: {"type": "negative", "message": "You had an argument with a friend and lost 3 happiness and 2 position.", "cost": ((-3, -2), (-3, -3))},
+    39: {"type": "negative", "message": "You felt left out at a social gathering and lost 4 happiness and 2 position.", "cost": ((-4, -2), (-4, -3))},
+    40: {"type": "negative", "message": "You canceled plans with friends at the last minute and lost 2 happiness and 2 position.", "cost": ((-2, -2), (-2, -3))},
+    41: {"type": "negative", "message": "You were embarrassed in front of a group and lost 4 happiness and 3 position.", "cost": ((-4, -3), (-4, -4))},
+    42: {"type": "negative", "message": "You missed a friend's important event and lost 3 happiness and 3 position.", "cost": ((-3, -3), (-3, -4))},
 
     # End
-    11: {"type": "end", "message": "End Message...", "cost": None}
+    43: {"type": "end", "message": "Congratulations! You've reached the end of your journey. Reflect on your experiences and the balance between happiness and position.", "cost": None}
 }
 
 """Visualizations"""
@@ -246,8 +278,14 @@ class State():
     current_player = self.d['currentPlayer']
     self.d['message'] = message['message']
 
+    cost_value = None
+    if self.has_disability:
+       cost_value = message['cost'][1]
+    else:
+       cost_value = message['cost'][0]
+
     # Updates happiness of the player.
-    new_happiness = self.d["players"][current_player].d["happiness"] + message['cost'][0]
+    new_happiness = self.d["players"][current_player].d["happiness"] + cost_value[0]
     if new_happiness < 0:
         self.d["players"][current_player].d["happiness"] = 0
     elif new_happiness > MAX_HAPPINESS:
@@ -256,11 +294,11 @@ class State():
        self.d["players"][current_player].d["happiness"] = new_happiness
 
     # Updates position of the player.
-    new_position = self.d["players"][current_player].d["position"] + message['cost'][1]
+    new_position = self.d["players"][current_player].d["position"] + cost_value[1]
     if new_position < 0:
        self.d["players"][current_player].d["position"] = 0
-    elif new_position > BOARD_LENGTH - 1:
-       self.d["players"][current_player].d["position"] = BOARD_LENGTH - 1
+    elif new_position > BOARD_LENGTH:
+       self.d["players"][current_player].d["position"] = BOARD_LENGTH
     else:
        self.d["players"][current_player].d["position"] = new_position
 
