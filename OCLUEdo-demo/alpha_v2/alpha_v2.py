@@ -260,10 +260,15 @@ class State():
 
   def grab_slot_values(self, slot_type):
     # Grabs the values of the slots: message
-    for event_id in range(len(SLOTS)):
-        event = SLOTS.get(event_id)
-        if event and event["type"] == slot_type:
-            return event
+    event = SLOTS.get(0)
+    while event and event["type"] != slot_type:
+       event_id = int(r.random() * len(SLOTS))
+       event = SLOTS.get(event_id)
+    return event
+    # for event_id in range(len(SLOTS)):
+    #     event = SLOTS.get(event_id)
+    #     if event and event["type"] == slot_type:
+    #         return event
 
   def handle_event(self):
     message_type = None
