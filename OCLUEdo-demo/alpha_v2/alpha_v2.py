@@ -206,13 +206,15 @@ class State():
   def __str__(self):
     # Produces a textual description of a state.
 
-    txt = "\n"
+    txt = ""
 
     # Case 1: When it is the next player's turn.
     if self.d['message'] != "":
         txt += "You rolled a " + str(self.d['currentRoll']) + ".\n"
         txt += str(self.d['message']) + "\n"
         for player_name, player_state in self.d["players"].items():
+            print(player_name)
+            print(player_state)
             if self.d['currentPlayer'] != player_name:
                 txt += "You now have " + str(player_state.d['happiness']) + " happiness "
                 txt += "and are at position " + str(player_state.d['position'] + 1) + " on the board. \n \n"
