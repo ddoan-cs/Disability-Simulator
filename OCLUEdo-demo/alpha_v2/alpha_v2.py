@@ -191,7 +191,7 @@ class State():
               d['board'][i] = SlotType.START
           elif i == BOARD_LENGTH - 1:
               d['board'][i] = SlotType.END
-          elif r.random() < 0.4:
+          elif r.random() > 0.4:
               d['board'][i] = SlotType.EVENT
           else:
               d['board'][i] = SlotType.EMPTY
