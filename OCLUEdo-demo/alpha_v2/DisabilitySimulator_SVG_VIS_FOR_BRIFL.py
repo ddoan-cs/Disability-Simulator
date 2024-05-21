@@ -56,7 +56,8 @@ def render_state(s, roles=None):
                      stroke = "black",
                      fill = ROLE_COLOR[role]))
 
-        position = s.current_position((role + 1) % 2)
+        position_of_previous = s.current_position((role + 1) % 2)
+        position_of_current = s.current_position(role)
 
         # Define gradients for each SlotType
         for slot_type, colors in SLOT_GRADIENT_COLORS.items():
@@ -85,11 +86,19 @@ def render_state(s, roles=None):
             # Add board position text
             dwg.add(dwg.text(str(i + 1), insert=(x + 8, y + 75 + 10), fill="black", font_size="8px"))
 
-            # Add a marker at the player's position
-            if i == position:
+            # Add a marker at the current player's position
+            if i == position_of_current:
                 dwg.add(dwg.circle(center=(x + 5 + space_width/2, y + 75 + space_width/2),
                            r=space_width/4,
                            fill=ROLE_COLOR[role]))
+
+            # Add a marker at the previous player's position 
+            if i == position_of_previous:
+                dwg.add(dwg.circle(center=(x + 5 + space_width/2, y + 75 + space_width/2),
+                           r=space_width/4,
+                           fill=ROLE_COLOR[(role + 1) % 2]))
+                
+            
 
         label = "It is now " + NAMES[role] + "'s turn."
         x = 350; y = 100
