@@ -218,14 +218,15 @@ class State():
             if self.d['currentPlayer'] != player_name:
                 txt += "You now have " + str(player_state.d['happiness']) + " happiness "
                 txt += "and are at position " + str(player_state.d['position'] + 1) + " on the board. \n \n"
-        txt += "It is now " + str(self.d['currentPlayer']) + "'s turn. \n"
+        if not self.is_goal: 
+          txt += "It is now " + str(self.d['currentPlayer']) + "'s turn. \n"
     else:
        # Case 2: When there is no previous player
        # Start State
        message = self.grab_slot_values("start")
        txt += str(message['message']) + "\n"
 
-       txt += "It is " + str(self.d['currentPlayer']) + "'s turn. \n"
+       txt += "It is Player1's turn. \n"
        for player_name, player_state in self.d["players"].items():
             if self.d['currentPlayer'] == player_name:
                 txt += "You have " + str(player_state.d['happiness']) + " happiness "
@@ -243,7 +244,10 @@ class State():
     return news
 
   def is_goal(self):
-    return any(player_state.d["position"] == BOARD_LENGTH - 1 for player_state in self.d["players"].values())
+    for player_state in self.d["players"].values():
+      if player_state.d["position"] == BOARD_LENGTH - 1:
+          return True
+    return False
 
   def current_player_slot_type(self):
     # Finds the slot type the current player is on.
@@ -340,9 +344,9 @@ def can_move(s, role):
       return False
 
   s.d['currentRoll'] = r.randint(1, 6)
-  for player, state in s.d['players'].items():
+  for player, state in s.d['players'].items(): 
       if s.current_position(player) == BOARD_LENGTH - 1:
-          return False
+        return False
   return True
 
 def move(s, role):
@@ -357,7 +361,7 @@ def move(s, role):
             state.d['position'] += s.d['currentRoll']
 
   news.handle_current_slot()
-  news.d['currentPlayer'] = next_player(news.d['currentPlayer'], )
+  news.d['currentPlayer'] = next_player(news.d['currentPlayer'])
   return news
 
 SESSION = None
@@ -381,7 +385,7 @@ def is_user_in_role(role_no):
   if rm==None: return False
   users_in_role = rm[role_no]
   return username in users_in_role
-
+   
 def get_session():
   return SESSION
 
