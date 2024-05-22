@@ -46,18 +46,22 @@ def render_state(s, roles=None):
                      font_size="25",
                      fill = "red"))
     else:
-        role = 0
-        if s.d['currentPlayer'] == 1:
+        current_player = s.d['currentPlayer']
+        if current_player == 1:
             role = 1
+        elif current_player == 0: 
+            role = 0
+
+        position_of_previous = s.current_position((role + 1) % 2)
+        position_of_current = s.current_position(role)
+
         #for role in roles:
         dwg.add(dwg.rect(insert = (0,0),
                      size = (str(W)+"px", str(H)+"px"),
                      stroke_width = "1",
                      stroke = "black",
-                     fill = ROLE_COLOR[role]))
+                     fill = "grey"))
 
-        position_of_previous = s.current_position((role + 1) % 2)
-        position_of_current = s.current_position(role)
 
         # Define gradients for each SlotType
         for slot_type, colors in SLOT_GRADIENT_COLORS.items():
@@ -99,14 +103,13 @@ def render_state(s, roles=None):
                            fill=ROLE_COLOR[(role + 1) % 2]))
                 
             
-
         label = "It is now " + NAMES[role] + "'s turn."
         x = 350; y = 100
         dwg.add(dwg.text(label, insert = (x+HALF_SQW, y-THREE_QUARTER_SQW),
                      text_anchor="middle",
                      font_size="25",
                      stroke = "black",
-                     fill = "black"))
+                     fill = ROLE_COLOR[role]))
 
         player = s.d['players'][role]
         happiness = "Happiness: " + str(player.d['happiness'])
@@ -136,7 +139,7 @@ def render_state(s, roles=None):
                                 font_size="12px")
             dwg.add(legend_text)
 
-            legend_y += legend_height + 5
+            legend_y += legend_height + 6
 
     dynamic_text(alpha_v2.State.__str__(s), dwg)
 
